@@ -310,25 +310,58 @@ static int signal_message(fwk_id_t unused)
     return FWK_SUCCESS;
 }
 
+static int si_power_on_cluster_cores(uint32_t id, uint32_t num, uint32_t offset)
+{
+    int status;
+    uint32_t core;
+    struct mod_pd_restricted_api *mod_pd_restricted_api =
+                            scp_platform_ctx.mod_pd_restricted_api;
+    uint32_t start_id = platform_get_core_count() +
+                        platform_get_cluster_count() + offset;
+
+    for(core = 0; core < num; core++){
+        status = mod_pd_restricted_api->set_state(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, start_id + core),
+        false,
+        MOD_PD_COMPOSITE_STATE(
+        MOD_PD_LEVEL_1,
+        0,
+        MOD_PD_STATE_ON,
+        MOD_PD_STATE_ON,
+        MOD_PD_STATE_ON));
+
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                "[PLATFORM SYSTEM] Failed to intialize the SI cluster%ld core%ld", id, core);
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int signal_message_boot_si_cl0(fwk_id_t unused)
 {
     FWK_LOG_INFO("[PLATFORM_SYSTEM] Received si cl0 doorbell event!\n");
 
-    return FWK_SUCCESS;
+    return si_power_on_cluster_cores(SCP_SI_CL0_ID, SCP_SI_CL0_CORE_NUM,
+                                     SCP_SI_CL0_CORE_OFS);
 }
 
 static int signal_message_boot_si_cl1(fwk_id_t unused)
 {
     FWK_LOG_INFO("[PLATFORM_SYSTEM] Received si cl1 doorbell event!\n");
 
-    return FWK_SUCCESS;
+    return si_power_on_cluster_cores(SCP_SI_CL1_ID, SCP_SI_CL1_CORE_NUM,
+                                     SCP_SI_CL1_CORE_OFS);
 }
 
 static int signal_message_boot_si_cl2(fwk_id_t unused)
 {
     FWK_LOG_INFO("[PLATFORM_SYSTEM] Received si cl2 doorbell event!\n");
 
-    return FWK_SUCCESS;
+    return si_power_on_cluster_cores(SCP_SI_CL2_ID, SCP_SI_CL2_CORE_NUM,
+                                     SCP_SI_CL2_CORE_OFS);
 }
 
 static const struct mod_transport_firmware_signal_api transport_signal_api = {
