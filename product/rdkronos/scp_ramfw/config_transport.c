@@ -119,6 +119,72 @@ static const struct fwk_element transport_element_table[] = {
                     MOD_MHU3_API_IDX_TRANSPORT_DRIVER),
         }),
     },
+    [SCP_CFGD_MOD_TRANSPORT_EIDX_BOOT_SI_CLUS0] = {
+        .name = "ATU_TRANSPORT",
+        .data = &((
+            struct mod_transport_channel_config) {
+                .transport_type = MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE,
+                .policies = MOD_TRANSPORT_POLICY_NONE,
+                .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+                .signal_api_id =
+                    FWK_ID_API_INIT(
+                        FWK_MODULE_IDX_SCP_PLATFORM,
+                        MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS0),
+                .driver_id =
+                    FWK_ID_SUB_ELEMENT_INIT(
+                        FWK_MODULE_IDX_MHU3,
+                        SCP_CFGD_MOD_MHU3_EIDX_SCP_RSS_S,
+                        3),
+                .driver_api_id =
+                    FWK_ID_API_INIT(
+                        FWK_MODULE_IDX_MHU3,
+                        MOD_MHU3_API_IDX_TRANSPORT_DRIVER),
+        }),
+    },
+    [SCP_CFGD_MOD_TRANSPORT_EIDX_BOOT_SI_CLUS1] = {
+        .name = "ATU_TRANSPORT",
+        .data = &((
+            struct mod_transport_channel_config) {
+                .transport_type = MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE,
+                .policies = MOD_TRANSPORT_POLICY_NONE,
+                .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+                .signal_api_id =
+                    FWK_ID_API_INIT(
+                        FWK_MODULE_IDX_SCP_PLATFORM,
+                        MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS1),
+                .driver_id =
+                    FWK_ID_SUB_ELEMENT_INIT(
+                        FWK_MODULE_IDX_MHU3,
+                        SCP_CFGD_MOD_MHU3_EIDX_SCP_RSS_S,
+                        4),
+                .driver_api_id =
+                    FWK_ID_API_INIT(
+                        FWK_MODULE_IDX_MHU3,
+                        MOD_MHU3_API_IDX_TRANSPORT_DRIVER),
+        }),
+    },
+    [SCP_CFGD_MOD_TRANSPORT_EIDX_BOOT_SI_CLUS2] = {
+        .name = "ATU_TRANSPORT",
+        .data = &((
+            struct mod_transport_channel_config) {
+                .transport_type = MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE,
+                .policies = MOD_TRANSPORT_POLICY_NONE,
+                .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+                .signal_api_id =
+                    FWK_ID_API_INIT(
+                        FWK_MODULE_IDX_SCP_PLATFORM,
+                        MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS2),
+                .driver_id =
+                    FWK_ID_SUB_ELEMENT_INIT(
+                        FWK_MODULE_IDX_MHU3,
+                        SCP_CFGD_MOD_MHU3_EIDX_SCP_RSS_S,
+                        5),
+                .driver_api_id =
+                    FWK_ID_API_INIT(
+                        FWK_MODULE_IDX_MHU3,
+                        MOD_MHU3_API_IDX_TRANSPORT_DRIVER),
+        }),
+    },
     [SCP_CFGD_MOD_TRANSPORT_EIDX_COUNT] = { 0 },
 };
 

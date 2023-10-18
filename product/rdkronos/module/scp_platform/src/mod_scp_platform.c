@@ -72,6 +72,15 @@ fwk_id_t pd_transition_notification_id =
 static fwk_id_t reset_ch_transport_id = FWK_ID_ELEMENT_INIT(
     FWK_MODULE_IDX_TRANSPORT, SCP_CFGD_MOD_TRANSPORT_EIDX_RESET);
 
+static fwk_id_t transport_id_clus0 = FWK_ID_ELEMENT_INIT(
+    FWK_MODULE_IDX_TRANSPORT, SCP_CFGD_MOD_TRANSPORT_EIDX_BOOT_SI_CLUS0);
+
+static fwk_id_t transport_id_clus1 = FWK_ID_ELEMENT_INIT(
+    FWK_MODULE_IDX_TRANSPORT, SCP_CFGD_MOD_TRANSPORT_EIDX_BOOT_SI_CLUS1);
+
+static fwk_id_t transport_id_clus2 = FWK_ID_ELEMENT_INIT(
+    FWK_MODULE_IDX_TRANSPORT, SCP_CFGD_MOD_TRANSPORT_EIDX_BOOT_SI_CLUS2);
+
 /* SCMI services required to enable the messaging stack */
 static unsigned int scmi_notification_table[] = {
     SCP_CFGD_MOD_SCMI_EIDX_PSCI,
@@ -301,9 +310,45 @@ static int signal_message(fwk_id_t unused)
     return FWK_SUCCESS;
 }
 
+static int signal_message_boot_si_cl0(fwk_id_t unused)
+{
+    FWK_LOG_INFO("[PLATFORM_SYSTEM] Received si cl0 doorbell event!\n");
+
+    return FWK_SUCCESS;
+}
+
+static int signal_message_boot_si_cl1(fwk_id_t unused)
+{
+    FWK_LOG_INFO("[PLATFORM_SYSTEM] Received si cl1 doorbell event!\n");
+
+    return FWK_SUCCESS;
+}
+
+static int signal_message_boot_si_cl2(fwk_id_t unused)
+{
+    FWK_LOG_INFO("[PLATFORM_SYSTEM] Received si cl2 doorbell event!\n");
+
+    return FWK_SUCCESS;
+}
+
 static const struct mod_transport_firmware_signal_api transport_signal_api = {
     .signal_error = signal_error,
     .signal_message = signal_message,
+};
+
+static const struct mod_transport_firmware_signal_api transport_boot_si_cl0 = {
+    .signal_error = signal_error,
+    .signal_message = signal_message_boot_si_cl0,
+};
+
+static const struct mod_transport_firmware_signal_api transport_boot_si_cl1 = {
+    .signal_error = signal_error,
+    .signal_message = signal_message_boot_si_cl1,
+};
+
+static const struct mod_transport_firmware_signal_api transport_boot_si_cl2 = {
+    .signal_error = signal_error,
+    .signal_message = signal_message_boot_si_cl2,
 };
 
 /*
@@ -369,6 +414,30 @@ static int scp_platform_bind(fwk_id_t id, unsigned int round)
         return status;
     }
 
+    status = fwk_module_bind(
+        transport_id_clus0,
+        FWK_ID_API(FWK_MODULE_IDX_TRANSPORT, MOD_TRANSPORT_API_IDX_FIRMWARE),
+        &scp_platform_ctx.transport_api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_module_bind(
+        transport_id_clus1,
+        FWK_ID_API(FWK_MODULE_IDX_TRANSPORT, MOD_TRANSPORT_API_IDX_FIRMWARE),
+        &scp_platform_ctx.transport_api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_module_bind(
+        transport_id_clus2,
+        FWK_ID_API(FWK_MODULE_IDX_TRANSPORT, MOD_TRANSPORT_API_IDX_FIRMWARE),
+        &scp_platform_ctx.transport_api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
     /* Bind to Power Domain module restricted API */
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
@@ -420,6 +489,18 @@ static int scp_platform_process_bind_request(
 
     case MOD_SCP_PLATFORM_API_IDX_TRANSPORT_SIGNAL:
         *api = &transport_signal_api;
+        break;
+
+    case MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS0:
+        *api = &transport_boot_si_cl0;
+        break;
+
+    case MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS1:
+        *api = &transport_boot_si_cl1;
+        break;
+
+    case MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS2:
+        *api = &transport_boot_si_cl2;
         break;
 
     default:

@@ -52,6 +52,12 @@ enum mod_scp_platform_api_idx {
     /*! Interface for Transport module */
     MOD_SCP_PLATFORM_API_IDX_TRANSPORT_SIGNAL,
 
+    MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS0,
+
+    MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS1,
+
+    MOD_SCP_PLATFORM_API_IDX_BOOT_SI_CLUS2,
+
     /*! Number of exposed interfaces */
     MOD_SCP_PLATFORM_API_COUNT
 };

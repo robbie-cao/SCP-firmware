@@ -36,6 +36,12 @@ struct mod_mhu3_channel_config
         MOD_MHU3_INIT_DBCH(1, 0, 1, 0),
         /* PBX CH 2, FLAG 0, MBX CH 2, FLAG 0 */
         MOD_MHU3_INIT_DBCH(2, 0, 2, 0),
+        /* PBX CH 3, FLAG 0, MBX CH 3, FLAG 0 */
+        MOD_MHU3_INIT_DBCH(3, 0, 3, 0),
+        /* PBX CH 4, FLAG 0, MBX CH 4, FLAG 0 */
+        MOD_MHU3_INIT_DBCH(4, 0, 4, 0),
+        /* PBX CH 5, FLAG 0, MBX CH 5, FLAG 0 */
+        MOD_MHU3_INIT_DBCH(5, 0, 5, 0),
     };
 
 /* Module element table */
