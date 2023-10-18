@@ -40,6 +40,10 @@
 #define CMN_CYPRUS_PPU_PWPR_OPMODE_FAM UINT64_C(0x0000000000000030)
 #define CMN_CYPRUS_PPU_PWPR_DYN_EN     UINT64_C(0x0000000000000100)
 
+/* CCAP and CPOR fields for configuring MPAM, used by HN-S CFG_CTL register */
+#define CMN_CYPRUS_HNS_CFG_SLC_MPAM_CPOR_EN_BIT (UINT64_C(1) << 17)
+#define CMN_CYPRUS_HNS_CFG_SLC_MPAM_CCAP_EN_BIT (UINT64_C(1) << 18)
+
 /* Shared driver context pointer */
 static struct cmn_cyprus_ctx *shared_ctx;
 
@@ -207,6 +211,10 @@ static void configure_syscache_sub_regions(struct cmn_cyprus_hns_reg *hns)
 
 static void configure_hns_pwpr(struct cmn_cyprus_hns_reg *hns)
 {
+    /* Enable CPOR and CCAP for MPAM */
+    hns->CFG_CTL |= CMN_CYPRUS_HNS_CFG_SLC_MPAM_CPOR_EN_BIT |
+        CMN_CYPRUS_HNS_CFG_SLC_MPAM_CCAP_EN_BIT;
+
     /* Configure the system cache RAM PPU */
     hns->PPU_PWPR = CMN_CYPRUS_PPU_PWPR_POLICY_ON |
         CMN_CYPRUS_PPU_PWPR_OPMODE_FAM | CMN_CYPRUS_PPU_PWPR_DYN_EN;
