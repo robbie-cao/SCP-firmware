@@ -16,7 +16,7 @@
 #include <fwk_id.h>
 #include <fwk_module.h>
 
-#define RD_KRONOS_PART_NUMBER 0x7EE
+#define RD_KRONOS_PART_NUMBER 0x73E
 
 static const struct fwk_element subsystem_table[] = {
     {
