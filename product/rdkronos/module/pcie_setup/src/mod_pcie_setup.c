@@ -481,7 +481,7 @@ static int pcie_setup_configure_pcie_controller(
 
     atu_api = pcie_setup_context.atu_api;
     atu_map.region_owner_id = FWK_ID_MODULE(FWK_MODULE_IDX_PCIE_SETUP);
-    atu_map.attributes = ATU_ENCODE_ATTRIBUTES_ROOT_PAS;
+    atu_map.attributes = ATU_ENCODE_ATTRIBUTES_SECURE_PAS;
     atu_map.log_addr_base = res_info->mapped_nci_gvp_base;
     atu_map.region_size = res_info->mapped_nci_gvp_size;
     atu_map.phy_addr_base = config->reg_base;
