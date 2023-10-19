@@ -33,9 +33,12 @@ struct tower_nci_domain_cfg_hdr {
 
 /* Tower NCI Sub-feature register set. Found in component domain */
 struct tower_nci_sub_feature_cfg_attr {
-    struct {
-        volatile uint32_t type:16;
-        volatile uint32_t reserved:16;
+    union {
+        volatile uint32_t node_type;
+        struct {
+            volatile uint32_t type:16;
+            volatile uint32_t reserved:16;
+        };
     };
     volatile uint32_t pointer;
 };

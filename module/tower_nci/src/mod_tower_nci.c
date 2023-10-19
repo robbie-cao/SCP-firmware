@@ -167,11 +167,13 @@ uintptr_t mod_tower_nci_process_subfeatures(uintptr_t base, uintptr_t offset,
     struct tower_nci_component_cfg_hdr *cfg_hdr;
     uint32_t count;
     uint32_t num_sub_features;
+    uint32_t node_type;
 
     cfg_hdr = (struct tower_nci_component_cfg_hdr *)(base + offset);
     num_sub_features = cfg_hdr->num_sub_features;
     for(count = 0; count < num_sub_features; count++) {
-        if (cfg_hdr->sub_feature[count].type == sub_feature_type) {
+        node_type = cfg_hdr->sub_feature[count].node_type & 0xFF;
+        if (node_type == sub_feature_type) {
             return base + cfg_hdr->sub_feature[count].pointer;
         }
     }
@@ -188,21 +190,26 @@ uint32_t mod_tower_nci_get_subfeature_address(
     uintptr_t subfeature_address;
     uint32_t child_count;
     uint32_t idx;
+    uint32_t hdr_type;
+    uint16_t hdr_id;
 
     cfg_hdr = (struct tower_nci_domain_cfg_hdr *)(base + offset);
-    if ((cfg_hdr->type == node_type) && (cfg_hdr->id == id)) {
+    hdr_type = cfg_hdr->node_type;
+    hdr_id = (hdr_type >> 16) & 0xFF;
+    hdr_type &= 0xFF;
+    if ((hdr_type == node_type) && (hdr_id == id)) {
         if (node_type < TOWER_NCI_NODE_TYPE_ASNI) {
             FWK_LOG_ERR("Invalid node type: %d", node_type);
             return 0;
         }
-        FWK_LOG_INFO("Found Node: %s ID: %d", node_type_str[cfg_hdr->type],
-                     cfg_hdr->id);
+        FWK_LOG_INFO("Found Node: %s ID: %d", node_type_str[hdr_type],
+                     hdr_id);
         return mod_tower_nci_process_subfeatures(base, offset,
                                                  sub_feature_type);
     }
 
     subfeature_address = 0;
-    if (cfg_hdr->type < TOWER_NCI_NODE_TYPE_ASNI) {
+    if (hdr_type < TOWER_NCI_NODE_TYPE_ASNI) {
         child_count = cfg_hdr->child_node_info;
         for (idx = 0; idx < child_count; idx++) {
             subfeature_address =
