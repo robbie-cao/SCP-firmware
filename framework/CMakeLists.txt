@@ -64,6 +64,10 @@ if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_PERF_FAST_CHANNELS")
 endif()
 
+if(SCP_TARGET_EXCLUDE_SCMI_PERF_PROTOCOL_OPS)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_FAST_CHANNELS")
+endif()
+
 if(SCP_ENABLE_PLUGIN_HANDLER)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER")
 endif()
@@ -102,6 +106,14 @@ endif()
 
 if(SCP_ENABLE_INBAND_MSG_SUPPORT)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_INBAND_MSG_SUPPORT")
+endif()
+
+if(SCP_ENABLE_ATU_MANAGE)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_ATU_MANAGE")
+endif()
+
+if(SCP_ENABLE_ATU_DELEGATE)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_ATU_DELEGATE")
 endif()
 
 #

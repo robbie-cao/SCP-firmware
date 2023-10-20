@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -210,6 +210,9 @@ struct mod_scmi_perf_config {
 
     /*! Number of Performance Plugins */
     size_t plugins_count;
+
+    /*! Identifier of the clock this module depends on */
+    fwk_id_t clock_id;
 };
 
 /*!

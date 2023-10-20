@@ -33,6 +33,8 @@ list(PREPEND SCP_MODULE_PATHS
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_SOURCE_DIR}/module/apremap")
 list(PREPEND SCP_MODULE_PATHS
+     "${CMAKE_SOURCE_DIR}/module/pcie_enumeration")
+list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_SOURCE_DIR}/module/pcie_integ_ctrl")
 
 # The order of the modules in the following list is the order in which the
@@ -55,6 +57,7 @@ list(APPEND SCP_MODULES "gtimer")
 list(APPEND SCP_MODULES "timer")
 list(APPEND SCP_MODULES "cmn700")
 list(APPEND SCP_MODULES "apcontext")
+list(APPEND SCP_MODULES "pcie_enumeration")
 list(APPEND SCP_MODULES "pcie_integ_ctrl")
 list(APPEND SCP_MODULES "mhu2")
 list(APPEND SCP_MODULES "transport")

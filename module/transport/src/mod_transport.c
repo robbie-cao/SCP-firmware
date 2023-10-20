@@ -10,9 +10,7 @@
 
 #include <internal/transport.h>
 
-#ifdef BUILD_HAS_MOD_POWER_DOMAIN
-#    include <mod_power_domain.h>
-#endif
+#include <mod_clock.h>
 
 #ifdef BUILD_HAS_MOD_SCMI
 #    include <mod_scmi.h>
@@ -959,69 +957,63 @@ static int transport_process_bind_request(
 
 static int transport_start(fwk_id_t id)
 {
-    int status = FWK_SUCCESS;
     struct transport_channel_ctx *channel_ctx;
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
-        return status;
+        return FWK_SUCCESS;
     }
 
     channel_ctx = &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
 
-    if (channel_ctx->config->transport_type ==
+    /* Only out-band transport mailbox needs to be initialized */
+    if (channel_ctx->config->transport_type !=
         MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
-#ifdef BUILD_HAS_MOD_POWER_DOMAIN
-        if (fwk_id_type_is_valid(channel_ctx->config->pd_source_id)) {
-            /* Register for power domain state transition notifications */
-            return fwk_notification_subscribe(
-                mod_pd_notification_id_power_state_transition,
-                channel_ctx->config->pd_source_id,
-                id);
-        } else {
-            return transport_mailbox_init(channel_ctx);
-        }
-#else
-        /*
-         * Initialize the mailbox immediately, if power domain module
-         * is not included in the firmware build.
-         */
-        return transport_mailbox_init(channel_ctx);
-#endif
+        return FWK_SUCCESS;
     }
-    return status;
+
+    /*
+     * Initialize the mailbox immediately, if the clock id is not provided
+     * in the config data.
+     */
+    if (fwk_id_is_equal(channel_ctx->config->clock_id, FWK_ID_NONE)) {
+        return transport_mailbox_init(channel_ctx);
+    }
+
+    /* Register for clock state notifications */
+    return fwk_notification_subscribe(
+        mod_clock_notification_id_state_changed,
+        channel_ctx->config->clock_id,
+        id);
 }
 
-#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static int transport_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
     struct transport_channel_ctx *channel_ctx;
-    int status = FWK_SUCCESS;
 
     channel_ctx =
         &transport_ctx
              .channel_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
-    struct mod_pd_power_state_transition_notification_params *params;
+    struct clock_notification_params *params;
 
-    assert(fwk_id_is_equal(
-        event->id, mod_pd_notification_id_power_state_transition));
+    fwk_assert(fwk_id_is_equal(
+        event->id, mod_clock_notification_id_state_changed));
+
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
-    params = (struct mod_pd_power_state_transition_notification_params *)
-                 event->params;
+    params = (struct clock_notification_params *)event->params;
 
-    if (params->state != MOD_PD_STATE_ON) {
-        if (params->state == MOD_PD_STATE_OFF) {
-            channel_ctx->out_band_mailbox_ready = false;
-        }
+    /* The mailbox must be accessed only after the Clock is configured */
+    if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+        return transport_mailbox_init(channel_ctx);
     } else {
-        status = transport_mailbox_init(channel_ctx);
+        channel_ctx->out_band_mailbox_ready = false;
     }
-    return status;
+
+    return FWK_SUCCESS;
 }
-#endif
 
 const struct fwk_module module_transport = {
     .type = FWK_MODULE_TYPE_HAL,
@@ -1032,7 +1024,5 @@ const struct fwk_module module_transport = {
     .bind = transport_bind,
     .start = transport_start,
     .process_bind_request = transport_process_bind_request,
-#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     .process_notification = transport_process_notification,
-#endif
 };

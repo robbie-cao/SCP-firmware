@@ -10,6 +10,7 @@
 
 #include <internal/scmi_perf.h>
 
+#include <mod_clock.h>
 #include <mod_dvfs.h>
 #include <mod_scmi.h>
 #include <mod_scmi_perf.h>
@@ -27,6 +28,7 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
 
@@ -474,7 +476,7 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
 }
 
 
-static int scmi_perf_start(fwk_id_t id)
+static int start_scmi_perf()
 {
     int status = FWK_SUCCESS;
 
@@ -566,7 +568,101 @@ static int scmi_perf_start(fwk_id_t id)
     return status;
 }
 
-/* Handle internal events */
+static int scmi_perf_start(fwk_id_t id)
+{
+    const struct mod_scmi_perf_config *config = fwk_module_get_data(id);
+
+    if (fwk_id_type_is_valid(config->clock_id)) {
+#ifdef BUILD_HAS_NOTIFICATION
+        /* Register the module for clock state notifications */
+        return fwk_notification_subscribe(
+                    mod_clock_notification_id_state_changed,
+                    config->clock_id,
+                    id);
+#endif
+    } else {
+        start_scmi_perf();
+    }
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Handle a request for get_level/limits.
+ */
+static int process_request_event(const struct fwk_event *event)
+{
+    int status;
+    struct scmi_perf_event_parameters *params;
+    struct scmi_perf_level_get_p2a return_values_level;
+    struct mod_dvfs_opp opp;
+
+    /* request event to DVFS HAL */
+    if (fwk_id_is_equal(event->id, scmi_perf_get_level)) {
+        params = (struct scmi_perf_event_parameters *)event->params;
+
+        status = scmi_perf_ctx.dvfs_api->get_current_opp(params->domain_id,
+                                                       &opp);
+        if (status == FWK_SUCCESS) {
+            /* DVFS value is ready */
+            return_values_level = (struct scmi_perf_level_get_p2a){
+                .status = SCMI_SUCCESS,
+                .performance_level = opp.level,
+            };
+
+            scmi_perf_respond(
+                &return_values_level,
+                params->domain_id,
+                (int)sizeof(return_values_level));
+
+            return status;
+        } else if (status == FWK_PENDING) {
+            /* DVFS value will be provided through a response event */
+            return FWK_SUCCESS;
+        } else {
+            return_values_level = (struct scmi_perf_level_get_p2a) {
+                .status = SCMI_HARDWARE_ERROR,
+            };
+
+            scmi_perf_respond(
+                &return_values_level,
+                params->domain_id,
+                (int)sizeof(return_values_level.status));
+
+            return FWK_E_DEVICE;
+        }
+    }
+
+    return FWK_E_PARAM;
+}
+
+/*
+ * Handle a response event from the HAL which indicates that the
+ * requested operation has completed.
+ */
+static int process_response_event(const struct fwk_event *event)
+{
+    struct mod_dvfs_params_response *params_level;
+    struct scmi_perf_level_get_p2a return_values_level;
+
+    if (fwk_id_is_equal(event->id, mod_dvfs_event_id_get_opp)) {
+        params_level = (struct mod_dvfs_params_response *)
+            event->params;
+        return_values_level = (struct scmi_perf_level_get_p2a) {
+            .status = params_level->status,
+            .performance_level = params_level->performance_level,
+        };
+        scmi_perf_respond(
+            &return_values_level,
+            event->source_id,
+            (return_values_level.status == SCMI_SUCCESS) ?
+                (int)sizeof(return_values_level) :
+                (int)sizeof(return_values_level.status));
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int process_internal_event(const struct fwk_event *event)
 {
     int status;
@@ -616,6 +712,32 @@ static int scmi_perf_process_event(
     return FWK_E_PARAM;
 }
 
+#ifdef BUILD_HAS_NOTIFICATION
+static int scmi_perf_process_notification(const struct fwk_event *event,
+    struct fwk_event *resp_event)
+{
+    struct clock_notification_params *params;
+
+    fwk_assert(
+        fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+
+    params = (struct clock_notification_params *)event->params;
+
+    /*
+     * Initialize SCMI perf only after all clocks are initialized.
+     */
+    if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+        start_scmi_perf();
+        /* Unsubscribe to the notification */
+        return fwk_notification_unsubscribe(event->id, event->source_id,
+                                            event->target_id);
+    }
+
+    return FWK_SUCCESS;
+}
+#endif
+
 /* SCMI Performance Management Protocol Definition */
 const struct fwk_module module_scmi_perf = {
     .api_count = (unsigned int)MOD_SCMI_PERF_API_COUNT,
@@ -626,4 +748,7 @@ const struct fwk_module module_scmi_perf = {
     .start = scmi_perf_start,
     .process_bind_request = scmi_perf_process_bind_request,
     .process_event = scmi_perf_process_event,
+#ifdef BUILD_HAS_NOTIFICATION
+    .process_notification = scmi_perf_process_notification,
+#endif
 };

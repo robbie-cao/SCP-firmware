@@ -23,6 +23,7 @@ struct fwk_module_config config_pl011 = {
                     .reg_base = LCP_UART_BASE,
                     .baud_rate_bps = 115200,
                     .clock_rate_hz = 24 * FWK_MHZ,
+                    .clock_id = FWK_ID_NONE_INIT,
                 },
         },
 

@@ -1,11 +1,11 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "config_power_domain.h"
+#include "config_clock.h"
 #include "rdn1e1_core.h"
 #include "scp_rdn1e1_mhu.h"
 #include "scp_rdn1e1_scmi.h"
@@ -60,10 +60,8 @@ static const struct fwk_element *transport_get_element_table(fwk_id_t module_id)
         config =
             (struct mod_transport_channel_config *)(transport_element_table[idx]
                                                         .data);
-        config->pd_source_id = FWK_ID_ELEMENT(
-            FWK_MODULE_IDX_POWER_DOMAIN,
-            rdn1e1_core_get_core_count() + rdn1e1_core_get_cluster_count() +
-                PD_STATIC_DEV_IDX_SYSTOP);
+        config->clock_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_CLOCK,
+            CLOCK_IDX_INTERCONNECT);
     }
 
     return transport_element_table;

@@ -25,9 +25,12 @@ set(SCP_ARCHITECTURE "arm-m")
 
 set(SCP_ENABLE_DEBUGGER_INIT FALSE)
 
+set(SCP_TARGET_EXCLUDE_SCMI_PERF_PROTOCOL_OPS TRUE)
+
 list(PREPEND SCP_MODULE_PATHS
     "${CMAKE_CURRENT_LIST_DIR}/../module/mod_lcp_platform")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/mhu3")
+list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/dvfs_handler")
 
 # The order of the modules in the following list is the order in which the
 # modules are initialized, bound, started during the pre-runtime phase.
@@ -36,5 +39,7 @@ list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/mhu3")
 list(APPEND SCP_MODULES "armv8m-mpu")
 list(APPEND SCP_MODULES "lcp-platform")
 list(APPEND SCP_MODULES "pl011")
+list(APPEND SCP_MODULES "clock")
 list(APPEND SCP_MODULES "transport")
 list(APPEND SCP_MODULES "mhu3")
+list(APPEND SCP_MODULES "dvfs-handler")

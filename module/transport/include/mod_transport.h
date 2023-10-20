@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -160,10 +160,10 @@ struct mod_transport_channel_config {
     size_t in_band_mailbox_size;
 
     /*!
-     * Identifier of the power domain that this channel depends on.
+     * Identifier of the clock that this channel depends on.
      * Applicable for out-band transport channels only.
      */
-    fwk_id_t pd_source_id;
+    fwk_id_t clock_id;
 
     /*!
      * Identifier of the API to bind to signal message/error for Firmware

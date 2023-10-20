@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_clock.h"
 #include "scp_sgi575_mhu.h"
 #include "scp_sgi575_scmi.h"
 #include "scp_software_mmap.h"
@@ -52,6 +53,17 @@ static const struct fwk_element transport_element_table[] = {
 
 static const struct fwk_element *transport_get_element_table(fwk_id_t module_id)
 {
+    unsigned int idx;
+    struct mod_transport_channel_config *config;
+
+    for (idx = 0; idx < SCP_SGI575_SCMI_SERVICE_IDX_COUNT; idx++) {
+        config =
+            (struct mod_transport_channel_config *)(transport_element_table[idx]
+                                                        .data);
+        config->clock_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_CLOCK,
+            CLOCK_IDX_INTERCONNECT);
+    }
+
     return transport_element_table;
 }
 
