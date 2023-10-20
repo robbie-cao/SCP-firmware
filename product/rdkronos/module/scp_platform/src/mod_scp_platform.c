@@ -49,8 +49,8 @@
 /* Timeout value for the timer API wait function */
 #define RSS_DOORBELL_WAIT_TIMEOUT_US (500 * 1000)
 
-/* DRAM address where TF-A BL31 binary will be preloaded in the FVP */
-#define ARM_TF_BL31_DRAM_ADDR (0xFFA00000)
+/* SRAM address where TF-A BL2 binary will be preloaded in the FVP */
+#define ARM_TF_BL2_SRAM_ADDR (0x00042000)
 
 static const struct mod_system_info *system_info;
 
@@ -134,6 +134,18 @@ bool check_rss_init_status(void *unused)
         FWK_LOG_ERR("[SCP_PLATFORM] RSS initialized!\n");
     }
     return rss_init_done;
+}
+
+/* Helper function to program the AP Core RVBAR */
+void program_ap_rvbar()
+{
+    uint8_t core_idx;
+
+    for (core_idx = 0; core_idx < platform_get_core_count(); core_idx++) {
+        /* Set RVBAR to TF-A BL2 SRAM address */
+        SCP_CLUSTER_UTILITY_CORE_MANAGER_PTR(core_idx)->PE_RVBARADDR_LW = ARM_TF_BL2_SRAM_ADDR;
+        SCP_CLUSTER_UTILITY_CORE_MANAGER_PTR(core_idx)->PE_RVBARADDR_UP = 0;
+    }
 }
 
 /* Helper function to program the LCP UART access */
@@ -652,6 +664,8 @@ int scp_platform_process_notification(
         }
     } else if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
         params = (struct clock_notification_params *)event->params;
+
+        program_ap_rvbar();
 
         /*
          * Initialize primary core and LCPs
