@@ -25,7 +25,7 @@
  */
 
 /* Secure SRAM size reserved by AP */
-#define SCP_AP_PERIPHERAL_SRAM_TRUSTED_RESERVED (0x1E000)
+#define SCP_AP_PERIPHERAL_SRAM_TRUSTED_RESERVED 0
 
 /* AP Peripheral trusted SRAM base in SCP's memory map */
 #define SCP_AP_PERIPHERAL_SRAM_TRUSTED_BASE \
