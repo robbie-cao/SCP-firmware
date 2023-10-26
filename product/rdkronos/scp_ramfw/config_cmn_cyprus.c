@@ -115,10 +115,30 @@ static const struct mod_cmn_cyprus_mem_region_map mmap[] = {
     {
         /*
          * Peripherals
-         * Map: 0x00_2F40_0000 - 0x00_5FFF_FFFF (780 MB)
+         * Map: 0x00_2F40_0000 - 0x00_3FFF_FFFF (268 MB)
          */
         .base = UINT64_C(0x002F400000),
-        .size = UINT64_C(780) * FWK_MIB,
+        .size = UINT64_C(268) * FWK_MIB,
+        .type = MOD_CMN_CYPRUS_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HND,
+    },
+    {
+        /*
+         * Shared SRAM between AP and Safety Island
+         * Map: 0x00_4000_0000 - 0x00_47FF_FFFF (128 MB including reserved area)
+         */
+        .base = UINT64_C(0x0040000000),
+        .size = UINT64_C(128) * FWK_MIB,
+        .type = MOD_CMN_CYPRUS_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_SHM_PC_SI,
+    },
+    {
+        /*
+         * Peripherals
+         * Map: 0x00_4800_0000 - 0x00_5FFF_FFFF (384 MB)
+         */
+        .base = UINT64_C(0x0048000000),
+        .size = UINT64_C(384) * FWK_MIB,
         .type = MOD_CMN_CYPRUS_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },

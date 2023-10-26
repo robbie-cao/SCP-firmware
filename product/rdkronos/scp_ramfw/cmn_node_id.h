@@ -24,6 +24,9 @@
 #define MEM_CNTRL7_ID 296
 
 #define NODE_ID_HND  300
+#define NODE_ID_HND1 360
+
+#define NODE_ID_SHM_PC_SI NODE_ID_HND1
 
 #define NODE_ID_HNT0 4
 #define NODE_ID_HNT1 260
