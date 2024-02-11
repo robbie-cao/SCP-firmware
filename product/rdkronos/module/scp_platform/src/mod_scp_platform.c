@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -80,6 +80,9 @@ static fwk_id_t transport_id_clus1 = FWK_ID_ELEMENT_INIT(
 
 static fwk_id_t transport_id_clus2 = FWK_ID_ELEMENT_INIT(
     FWK_MODULE_IDX_TRANSPORT, SCP_CFGD_MOD_TRANSPORT_EIDX_BOOT_SI_CLUS2);
+
+static fwk_id_t shutdown_ch_transport_id = FWK_ID_ELEMENT_INIT(
+    FWK_MODULE_IDX_TRANSPORT, SCP_CFGD_MOD_TRANSPORT_EIDX_SHUTDOWN);
 
 /* SCMI services required to enable the messaging stack */
 static unsigned int scmi_notification_table[] = {
@@ -277,18 +280,31 @@ static int scp_platform_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
     int status;
 
-    status = scp_platform_ctx.transport_api->trigger_interrupt(
-            reset_ch_transport_id);
+    switch (system_shutdown) {
+    case MOD_PD_SYSTEM_SHUTDOWN:
+        status = scp_platform_ctx.transport_api->trigger_interrupt(
+                shutdown_ch_transport_id);
+        break;
+
+    case MOD_PD_SYSTEM_COLD_RESET:
+        status = scp_platform_ctx.transport_api->trigger_interrupt(
+                reset_ch_transport_id);
+        break;
+    default:
+        FWK_LOG_INFO("[PLATFORM_SYSTEM] Unknown shutdown command!");
+        status = FWK_E_PARAM;
+        break;
+    }
+
     if (status != FWK_SUCCESS) {
-        FWK_LOG_ERR("[PLATFORM_SYSTEM] FATAL ERROR! Unable to trigger"
-                "RSS doorbell for reset event\n");
+        FWK_LOG_ERR("[PLATFORM SYSTEM] Shutdown/Reboot request failed");
         return FWK_E_PANIC;
     }
 
     /* wait for RSS to complete the system wide reset */
     __WFI();
 
-    return FWK_E_DEVICE;
+    return status;
 }
 
 static const struct mod_system_power_driver_api
@@ -477,6 +493,14 @@ static int scp_platform_bind(fwk_id_t id, unsigned int round)
 
     status = fwk_module_bind(
         transport_id_clus2,
+        FWK_ID_API(FWK_MODULE_IDX_TRANSPORT, MOD_TRANSPORT_API_IDX_FIRMWARE),
+        &scp_platform_ctx.transport_api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_module_bind(
+        shutdown_ch_transport_id,
         FWK_ID_API(FWK_MODULE_IDX_TRANSPORT, MOD_TRANSPORT_API_IDX_FIRMWARE),
         &scp_platform_ctx.transport_api);
     if (status != FWK_SUCCESS) {

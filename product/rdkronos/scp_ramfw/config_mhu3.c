@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -42,6 +42,8 @@ struct mod_mhu3_channel_config
         MOD_MHU3_INIT_DBCH(4, 0, 4, 0),
         /* PBX CH 5, FLAG 0, MBX CH 5, FLAG 0 */
         MOD_MHU3_INIT_DBCH(5, 0, 5, 0),
+        /* PBX CH 6, FLAG 0, MBX CH 6, FLAG 0 */
+        MOD_MHU3_INIT_DBCH(6, 0, 6, 0),
     };
 
 /* Module element table */

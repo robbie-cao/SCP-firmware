@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -183,6 +183,28 @@ static const struct fwk_element transport_element_table[] = {
                     FWK_ID_API_INIT(
                         FWK_MODULE_IDX_MHU3,
                         MOD_MHU3_API_IDX_TRANSPORT_DRIVER),
+        }),
+    },
+    [SCP_CFGD_MOD_TRANSPORT_EIDX_SHUTDOWN] = {
+        .name = "SCP_PLATFORM_TRANSPORT_SHUTDOWN",
+        .data = &((
+            struct mod_transport_channel_config) {
+            .transport_type = MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE,
+            .policies = MOD_TRANSPORT_POLICY_NONE,
+            .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_REQUESTER,
+            .signal_api_id =
+                FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_SCP_PLATFORM,
+                    MOD_SCP_PLATFORM_API_IDX_TRANSPORT_SIGNAL),
+            .driver_id =
+                FWK_ID_SUB_ELEMENT_INIT(
+                    FWK_MODULE_IDX_MHU3,
+                    SCP_CFGD_MOD_MHU3_EIDX_SCP_RSS_S,
+                    6),
+            .driver_api_id =
+                FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_MHU3,
+                    MOD_MHU3_API_IDX_TRANSPORT_DRIVER),
         }),
     },
     [SCP_CFGD_MOD_TRANSPORT_EIDX_COUNT] = { 0 },
