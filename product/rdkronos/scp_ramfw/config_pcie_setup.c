@@ -105,9 +105,6 @@
 
 static const struct fwk_element pcie_setup_element_table[] = {
     IO_MACRO_PCIE_ELEMENT_CONFIG(0, true, true, true, true, true),
-    IO_MACRO_PCIE_ELEMENT_CONFIG(1, false, false, false, false, true),
-    IO_MACRO_PCIE_ELEMENT_CONFIG(2, false, false, false, false, true),
-    IO_MACRO_PCIE_ELEMENT_CONFIG(3, false, false, false, false, true),
     { 0 }
 };
 
