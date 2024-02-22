@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -21,7 +21,7 @@
 #include <fwk_string.h>
 
 /*! Timeout value for response message in microseconds */
-#define ATU_RESPONSE_WAIT_TIMEOUT_US (100 * 1000)
+#define ATU_RESPONSE_WAIT_TIMEOUT_US (500 * 1000)
 
 const char *atu_response_error_name[ATU_MSG_RESPONSE_COUNT] = {
     [ATU_MSG_RESPONSE_GENERAL_ERROR] = "Request failed",
