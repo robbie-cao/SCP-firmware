@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Arm Limited. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -38,6 +38,7 @@ struct mod_tower_nci_ctx {
 
 struct mod_tower_nci_ctx tower_nci_ctx;
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 static char *node_type_str[TOWER_NCI_NODE_TYPE_MAX] = {
     "CFGNI",
     "VD",
@@ -50,6 +51,7 @@ static char *node_type_str[TOWER_NCI_NODE_TYPE_MAX] = {
     "HMNI",
     "PMNI",
 };
+#endif
 
 /*
  * PSAM Programming

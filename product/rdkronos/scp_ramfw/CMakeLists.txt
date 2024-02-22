@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -11,7 +11,7 @@
 
 add_executable(rdkronos-bl2)
 
-set(SCP_LOG_LEVEL "DEBUG" PARENT_SCOPE)
+set(SCP_LOG_LEVEL "ERROR" PARENT_SCOPE)
 
 target_include_directories(
     rdkronos-bl2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"

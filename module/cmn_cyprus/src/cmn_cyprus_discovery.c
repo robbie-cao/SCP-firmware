@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -118,6 +118,7 @@ static unsigned int encoding_bits;
 /* Mask to get the x and y coordinates from node position */
 static unsigned int mask_bits;
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 /* CMN Cyprus revision names */
 static const char *const cmn_cyprus_rev_to_name[] = {
     [CMN_CYPRUS_PERIPH_ID_2_REV_R0_P0] = "r0p0",
@@ -126,6 +127,7 @@ static const char *const cmn_cyprus_rev_to_name[] = {
     [CMN_CYPRUS_PERIPH_ID_2_REV_R3_P0] = "r3p0",
     [CMN_CYPRUS_PERIPH_ID_UNKNOWN_REV] = "Unknown!",
 };
+#endif
 
 static void set_encoding_and_masking_bits(struct cmn_cyprus_ctx *ctx)
 {
@@ -158,6 +160,7 @@ static unsigned int get_node_pos_y(unsigned int node_id)
     return (node_id >> CMN_CYPRUS_NODE_ID_Y_POS) & mask_bits;
 }
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 static unsigned int get_cmn_cyprus_revision(struct cmn_cyprus_cfgm_reg *root)
 {
     return (root->PERIPH_ID[1] & CMN_CYPRUS_PERIPH_ID_2_MASK) >>
@@ -178,6 +181,7 @@ static const char *get_cmn_cyprus_revision_name(
 
     return cmn_cyprus_rev_to_name[revision];
 }
+#endif
 
 static enum node_type get_node_type(void *node_base)
 {
@@ -208,6 +212,7 @@ static void *get_child_node(
     return child_node;
 }
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 const char *const type_to_name[] = {
     [NODE_TYPE_INVALID] = "<Invalid>",
     [NODE_TYPE_DVM] = "DVM",
@@ -241,6 +246,7 @@ static const char *get_node_type_name(enum node_type node_type)
     /* Invalid node IDs */
     return type_to_name[NODE_TYPE_INVALID];
 }
+#endif
 
 static bool is_child_external(void *node_base, unsigned int child_index)
 {
